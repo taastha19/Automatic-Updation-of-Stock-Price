@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NHPC Stock</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .table {
+            margin-bottom: 1.5rem;
+        }
+        #message {
+            margin-top: 1rem;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center mb-4">NHPC Stock Information</h2>
+    <table class="table table-bordered table-hover">
+        <tbody>
+        <tr class="table-warning">
+            <td><a style="color:#004473;" href="https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=NHPC&amp;illiquid=0&amp;smeFlag=0&amp;itpFlag=0" target="_blank">NSE</a></td>
+            <td id="nse" style="color:#004473;">102.45</td>
+            <td id="nse_date"><span style="color:#004473;">24 May, 2024 03.30 PM</span></td>
+        </tr>
+        <tr class="table-warning">
+            <td><a style="color:#004473;" href="http://www.bseindia.com/stock-share-price/nhpc-ltd/nhpc/533098/" target="_blank">BSE</a></td>
+            <td id="bse" style="color:#004473;">102.40</td>
+            <td id="bse_date"><span style="color:#004473;">24 May, 2024 03.30 PM</span></td>
+        </tr>
+        </tbody>
+    </table>
+</table>
+
+<form id="myForm" method="post" action="stock.php">
+    <input type="text" id="nse_price" name="nse_price" placeholder="Enter stock price" />
+    <input type="text" id="nse_dateTime" name="nse_dateTime" placeholder="Enter DateTime" />
+    <br>
+    <input type="text" id="bse_price" name="bse_price" placeholder="Enter stock price" />
+    <input type="text" id="bse_dateTime" name="bse_dateTime" placeholder="Enter DateTime" />
+    <br>
+    <br>
+    <!-- <button type="submit" name="sub">SAVE</button> -->
+</form>
+
+<!-- <form method="post" action="stock.html">
+    <button type="button" class="refresh-button" onclick="refreshPage()">Refresh Page</button>
+</form> -->
+
+<div id="message"></div>
+
+<script>
+    function refreshPage() {
+        // location.reload();
+        calling_api()
+        console.log("Refreshing");
+            // event.preventDefault(); // Prevent the default form submission
+
+        // Create a FormData object from the form
+        var formData = new FormData();
+        formData.append('nse_price',document.getElementById('nse_price').value);
+        formData.append('nse_dateTime',document.getElementById('nse_dateTime').value);
+        formData.append('bse_price',document.getElementById('bse_price').value);
+        formData.append('bse_dateTime',document.getElementById('bse_dateTime').value);
+
+        // Send the form data using fetch
+        fetch('stock.php', {
+            method: 'POST',
+            body: formData
+        })
+       .then(data => {
+            // console.log('Form submitted successfully:', data);
+            let d = new Date();
+            document.getElementById('message').innerHTML = `Last Record updated successfully on ${d}`;
+            // Optionally, display a success message or update the page content
+        })
+        // .catch(error => {
+        //     console.error('Error submitting form:', error);
+        // });
+       }
+    
+    async function calling_api() {
+        let response = await fetch('api_call.php');
+        let data = await response.json(); 
+        document.getElementById("nse").innerHTML = data["LastTradedPrice"];
+        document.getElementById("nse_date").innerHTML = data["LastTradedTime"];
+        document.getElementById('nse_price').value = data["LastTradedPrice"];
+        document.getElementById('nse_dateTime').value = data["LastTradedTime"];
+
+        let response_bse = await fetch('api_call2.php');
+        let data_bse = await response_bse.json();
+        document.getElementById("bse").innerHTML = data_bse["LastTradedPrice"];
+        document.getElementById("bse_date").innerHTML = data_bse["LastTradedTime"];
+        document.getElementById('bse_price').value = data_bse["LastTradedPrice"];
+        document.getElementById('bse_dateTime').value = data_bse["LastTradedTime"];
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        setInterval(refreshPage, 5000);
+
+    });
+    // var formData = new FormData(this);
+    // console.log(formData);
+    // document.getElementById('myForm').addEventListener('submit', function(event) {
+    //     event.preventDefault(); // Prevent the default form submission
+
+    //     // Create a FormData object from the form
+    //     var formData = new FormData(this);
+    //     // Send the form data using fetch
+    //     fetch('stock.php', {
+    //         method: 'POST',
+    //         body: formData
+    //     })
+    //     .then(response => response.text())
+        // .then(data => {
+        //     console.log('Form submitted successfully:', data);
+        //     document.getElementById('message').innerHTML = 'Record updated successfully';
+        //     // Optionally, display a success message or update the page content
+        // })
+        // .catch(error => {
+        //     console.error('Error submitting form:', error);
+        // });
+    // });
+    
+</script>
+
+</body>
+</html>
